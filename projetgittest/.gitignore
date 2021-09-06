@@ -1,1 +1,6 @@
-/bin/
+/.metadata/
+/bin
+.class
+.classpath
+/.settings
+
