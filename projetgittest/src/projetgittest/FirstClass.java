@@ -5,7 +5,7 @@ public class FirstClass {
 	private String name;
 	
 	public FirstClass(){
-		name="je suis la premier class qui sera commité";
+		name="je suis la premier class qui sera commité 2";
 	}
 
 	public String getName() {
