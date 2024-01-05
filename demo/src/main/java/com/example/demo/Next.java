@@ -8,11 +8,6 @@ public class Next {
 	// Fonction pour trouver le prochain nombre qui remplit la condition
 	// nous incrementons jusqu'au moment où la condition est rempie
 	private static int next(int number) {
-		Integer integerMAX = Integer.MAX_VALUE;
-
-		if (number > integerMAX) {
-			return 0;
-		}
 
 		Set<Character> digitSet = new HashSet<>();
 
@@ -22,6 +17,11 @@ public class Next {
 		}
 
 		do {
+			if (number == Integer.MAX_VALUE) {
+				number = -1;
+				break;
+			}
+
 			number++;
 		} while (testListDigit(Integer.toString(number), digitSet));
 
@@ -31,7 +31,7 @@ public class Next {
 	// la fonction test si l'un des chiffres de la liste est present dans le nombre
 	// nous travaillons avec des String et des Char
 	private static boolean testListDigit(String nextNumberStr, Set<Character> digitSet) {
-		
+
 		for (char digit : digitSet) {
 			if (nextNumberStr.indexOf(digit) >= 0) {
 				return true;
