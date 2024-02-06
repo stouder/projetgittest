@@ -77,6 +77,11 @@ Gloucester Rugby,33,5,US Oyonnax,3,0
 Zebre,23,2,CA Brive,13,1
 CA Brive,20,2,Gloucester Rugby,31,4
 US Oyonnax,20,3,Zebre,3,0
+
+loucester Rugby - Connacht
+Exeter Chiefs - Newcastle Falcons
+Newport Dragons - Cardiff Blues
+London Irish - Edinburgh Rugby
  */
 
 class SolutionEuropeanCup {
@@ -84,6 +89,7 @@ class SolutionEuropeanCup {
 	private static final int NUM_POOLS = 5;
 	private static final int TOTAL_MATCHES = 60;
 	private static final String POOL = "Pool ";
+	private static final int SECOND_QUALIFIED_TEAMS = 3;
 
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
@@ -104,7 +110,7 @@ class SolutionEuropeanCup {
 		}
 
 		int numMatch = 1;
-		Map<String, Pair<Integer, Integer>> teamresultatTemp = new HashMap<>();
+		final LinkedHashMap<String, Pair<Integer, Integer>> teamresultatTemp = new LinkedHashMap<>();
 		while (numMatch <= TOTAL_MATCHES) {
 			String[] match = scanner.nextLine().split(",");
 			processMatch(teamresultatTemp, match);
@@ -120,7 +126,7 @@ class SolutionEuropeanCup {
 		Map<String, Pair<Integer, Integer>> secondTeam = new HashMap<>();
 		List<String> teamsForQuart = qualified(resultats, firstTeam, secondTeam);
 
-		getQuarterFinals(teamsForQuart);
+		getQuarterFinals(teamsForQuart).forEach(System.out::println);
 
 		scanner.close();
 	}
@@ -165,46 +171,43 @@ class SolutionEuropeanCup {
 		return score;
 	}
 
-	private static void classByPool(Map<String, Pair<Integer, Integer>> teamresultatTemp,
-			Map<String, Map<String, Pair<Integer, Integer>>> resultats, int pool) {
+	private static void classByPool(LinkedHashMap<String, Pair<Integer, Integer>> resultatByPool,
+			Map<String, Map<String, Pair<Integer, Integer>>> resultats, int numpool) {
 
-		List<Map.Entry<String, Pair<Integer, Integer>>> entries = new ArrayList<>(
-				resultats.get(POOL + pool).entrySet());
+		Map<String, Pair<Integer, Integer>> poolResults = resultats.get(POOL + numpool);
 
-		for (Map.Entry<String, Pair<Integer, Integer>> entry : entries) {
-			String team = entry.getKey();
-
-			if (teamresultatTemp.containsKey(team)) {
-				Pair<Integer, Integer> resultatFinal = teamresultatTemp.get(team);
-				entry.setValue(resultatFinal);
+		resultatByPool.forEach((team, resultatTeam) -> {
+			if (poolResults.containsKey(team)) {
+				poolResults.put(team, resultatTeam);
 			}
-		}
+		});
 
-		entries.sort(Comparator.<Map.Entry<String, Pair<Integer, Integer>>, Integer>comparing(
-				entry -> entry.getValue().getLeft()).thenComparing(entry -> entry.getValue().getRight()).reversed());
+		Map<String, Pair<Integer, Integer>> sortedPoolResults = poolResults.entrySet().stream()
+				.sorted(Comparator
+						.comparing((Map.Entry<String, Pair<Integer, Integer>> entry) -> entry.getValue().getLeft())
+						.thenComparing(entry -> entry.getValue().getRight()).reversed())
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue,
+						LinkedHashMap::new));
 
-		Map<String, Pair<Integer, Integer>> sortedResultats = new LinkedHashMap<>();
-		for (Map.Entry<String, Pair<Integer, Integer>> entry : entries) {
-			sortedResultats.put(entry.getKey(), entry.getValue());
-		}
-
-		resultats.put(POOL + pool, sortedResultats);
+		resultats.put(POOL + numpool, sortedPoolResults);
 	}
 
 	private static List<String> qualified(Map<String, Map<String, Pair<Integer, Integer>>> resultats,
 			Map<String, Pair<Integer, Integer>> firstTeam, Map<String, Pair<Integer, Integer>> secondTeam) {
+		
+		List<String> qualified = new ArrayList<>();
+		
 		for (Map.Entry<String, Map<String, Pair<Integer, Integer>>> poolEntry : resultats.entrySet()) {
 			Map<String, Pair<Integer, Integer>> poolResults = poolEntry.getValue();
 
 			int count = 0;
 			for (Map.Entry<String, Pair<Integer, Integer>> teamEntry : poolResults.entrySet()) {
-
 				if (count == 0) {
 					firstTeam.put(teamEntry.getKey(), teamEntry.getValue());
 				} else if (count == 1) {
 					secondTeam.put(teamEntry.getKey(), teamEntry.getValue());
 				}
-
+				
 				count++;
 				if (count == 2) {
 					break;
@@ -212,35 +215,23 @@ class SolutionEuropeanCup {
 			}
 		}
 
-		List<String> qualified = new ArrayList<>();
-		sortResultatTeams(firstTeam);
-		sortResultatTeams(secondTeam);
-		for (Map.Entry<String, Pair<Integer, Integer>> entry : firstTeam.entrySet()) {
+	
+		LinkedHashMap<String, Pair<Integer, Integer>> firstTeamSorted = sortResultatTeams(firstTeam);
+		LinkedHashMap<String, Pair<Integer, Integer>> secondTeamSorted = sortResultatTeams(secondTeam);
+		
+		for (Map.Entry<String, Pair<Integer, Integer>> entry : firstTeamSorted.entrySet()) {
 			qualified.add(entry.getKey());
 		}
-		int num = 0;
-		for (Map.Entry<String, Pair<Integer, Integer>> entry : secondTeam.entrySet()) {
-			if (num != 3) {
-				qualified.add(entry.getKey());
-			} else {
-				break;
-			}
 
+		int num = 0;
+		for (Map.Entry<String, Pair<Integer, Integer>> entry : secondTeamSorted.entrySet()) {
+			if (num < SECOND_QUALIFIED_TEAMS) {
+				qualified.add(entry.getKey());
+			}
 			num++;
 		}
 
 		return qualified;
-	}
-
-	private static void sortResultatTeams(Map<String, Pair<Integer, Integer>> teamResultats) {
-		teamResultats.entrySet().stream().sorted((e1, e2) -> e1.getValue().getLeft() - e2.getValue().getLeft())
-				.collect(Collectors.toMap(
-	                    Map.Entry::getKey,
-	                    Map.Entry::getValue,
-	                    (e1, e2) -> e1,
-	                    LinkedHashMap::new
-	            ));
-
 	}
 
 	private static List<String> getQuarterFinals(List<String> qualified) {
@@ -255,7 +246,18 @@ class SolutionEuropeanCup {
 		return quarterFinals;
 	}
 
-	private static void display(Map<String, Map<String, Pair<Integer, Integer>>> resultats) {
+	private static LinkedHashMap<String, Pair<Integer, Integer>> sortResultatTeams(
+			Map<String, Pair<Integer, Integer>> teamResultats) {
+		return teamResultats.entrySet().stream()
+				.sorted(Comparator
+						.comparing((Map.Entry<String, Pair<Integer, Integer>> entry) -> entry.getValue().getLeft())
+						.thenComparing(entry -> entry.getValue().getRight()).reversed())
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue,
+						LinkedHashMap::new));
+
+	}
+
+	private static void displayResultatMatch(Map<String, Map<String, Pair<Integer, Integer>>> resultats) {
 
 		resultats.forEach((key, value) -> {
 			System.out.println("Key: " + key);
