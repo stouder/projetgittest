@@ -9,18 +9,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionController {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4432420406875548549L;
-
 	@ExceptionHandler(AuthenticationException.class)
 	public ResponseEntity<String> handleUsernameNotFoundException(AuthenticationException ex) {
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Mot de passe ou login incorrect.");
 	}
-	
+
 	@ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleException(Exception ex) {
+	public ResponseEntity<Object> handleException(Exception ex) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur Serveur Interne.");
-    }
+	}
 }

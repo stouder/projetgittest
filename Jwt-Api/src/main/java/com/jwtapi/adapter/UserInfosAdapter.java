@@ -1,6 +1,5 @@
 package com.jwtapi.adapter;
 
-import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
