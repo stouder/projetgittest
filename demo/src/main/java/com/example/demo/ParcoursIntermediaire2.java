@@ -40,6 +40,7 @@ public class ParcoursIntermediaire2 {
 
 	static void findPathsRecursive(Map<Integer, List<Integer>> routes, int currentPoint, int endPoint,
 			List<Integer> currentPath, List<List<Integer>> paths) {
+		
 		currentPath.add(currentPoint);
 
 		if (currentPoint == endPoint) {

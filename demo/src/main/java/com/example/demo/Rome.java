@@ -11,16 +11,7 @@ import java.math.*;
 class Rome {
 
     public static void main(String args[]) {
-//        Scanner in = new Scanner(System.in);
-//        int n = in.nextInt();
-//        for (int i = 0; i < n; i++) {
-//            for (int j = 0; j < 2; j++) {
-//                int c = in.nextInt();
-//            }
-//        }
 
-        // Write an answer using System.out.println()
-        // To debug: System.err.println("Debug messages...");
     List<List<Integer>> paths = new ArrayList<>();
     paths.add(Arrays.asList(1, 50));
     paths.add(Arrays.asList(50,100));

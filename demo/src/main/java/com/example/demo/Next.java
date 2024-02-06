@@ -1,6 +1,9 @@
 package com.example.demo;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class Next {
@@ -28,6 +31,35 @@ public class Next {
 		return number;
 	}
 
+	public static int next2(int n) {
+		int res = n;
+
+		List<Integer> numbers = new ArrayList<>();
+
+		while (n != 0) {
+			numbers.add(n % 10);
+			n /= 10;
+		}
+
+		while (true) {
+			res++;
+
+			if (res == Integer.MAX_VALUE) {
+				res = -1;
+				break;
+			}
+
+			String tempString = Integer.toString(res);
+			Optional<Integer> resultat = numbers.stream().filter(d -> tempString.contains(String.valueOf(d))).findAny();
+			
+			if (resultat.isEmpty()) {
+				break;
+			}
+		}
+
+		return res;
+	}
+	
 	// la fonction test si l'un des chiffres de la liste est present dans le nombre
 	// nous travaillons avec des String et des Char
 	private static boolean testListDigit(String nextNumberStr, Set<Character> digitSet) {

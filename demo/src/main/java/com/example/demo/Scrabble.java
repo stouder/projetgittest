@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-class Scrable {
+class Scrabble {
 
 	public static void main(String args[]) {
 		Scanner in = new Scanner(System.in);

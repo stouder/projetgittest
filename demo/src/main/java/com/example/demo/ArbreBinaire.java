@@ -1,10 +1,15 @@
 package com.example.demo;
 
+import java.util.Deque;
 import java.util.Stack;
+
+import lombok.extern.slf4j.Slf4j;
+
 
 class Node {
     int value;
-    Node left, right;
+    Node left;
+    Node right;
 
     public Node(int item) {
         value = item;
@@ -12,6 +17,7 @@ class Node {
     }
 }
 
+@Slf4j
 public class ArbreBinaire {
 
     Node root;
@@ -82,15 +88,15 @@ public class ArbreBinaire {
 
         // Rechercher la valeur dans l'arbre
         if (arbre.rechercheValeurStack(valeurRecherchee)) {
-        	System.out.println("La fonction rechercheValeurStack a permis de trouver la valeur " + valeurRecherchee + " dans l'arbre.");
+        	log.info("La fonction rechercheValeurStack a permis de trouver la valeur {} dans l'arbre.",valeurRecherchee);
         } else {
-        	System.out.println("La fonction rechercheValeurStack n'a pas permis de trouver la valeur " + valeurRecherchee + " dans l'arbre.");
+        	log.info("La fonction rechercheValeurStack n'a pas permis de trouver la valeur {} dans l'arbre.",valeurRecherchee);
         }
         
         if (arbre.rechercheIterative(valeurRecherchee)) {
-            System.out.println("La fonction rechercheIterative a permis de trouver la valeur " + valeurRecherchee + " dans l'arbre.");
+        	log.info("La fonction rechercheIterative a permis de trouver la valeur {} dans l'arbre.",valeurRecherchee);
         } else {
-        	System.out.println("La fonction rechercheIterative n'a pas permis de trouver la valeur " + valeurRecherchee + " dans l'arbre.");
+        	log.info("La fonction rechercheIterative n'a pas permis de trouver la valeur {} dans l'arbre.",valeurRecherchee);
         }
         
     }

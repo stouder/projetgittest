@@ -5,12 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Change {
-	long bill10;
-	long bill5;
-	long coin2;
-	
-
+@AllArgsConstructor
+public class Personne {
+	private String name;
+	private int age;
 }

@@ -14,7 +14,7 @@ class ProgrammationDynamique {
     private static int change(int amount, int[] coins) {
         int[] dp = new int[amount + 1];
         Arrays.fill(dp, 0);
-        dp[0] = 1; // Une seule façon de rendre 0
+        dp[0] = 1; // si 0 on ne rend pas de monnaie. Donc une seule facon de rendre O.
 
         for (int coin : coins) {
             for (int i = coin; i <= amount; i++) {

@@ -8,7 +8,7 @@ import java.math.*;
  * Auto-generated code below aims at helping you parse
  * the standard input according to the problem statement.
  **/
-class SolutionScrable {
+class SolutionScrabble {
     static int[] letterPoints = new int[]{1, 3, 3, 2, 1, 4, 2, 4, 1, 6, 5, 1, 3, 1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 6, 4, 10};
     //                                    A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P,  Q, R, S, T, U, V, W, X, Y,  Z
 
