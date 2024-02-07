@@ -1,5 +1,6 @@
 package com.jwtapi.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jwtapi.adapter.UserInfosAdapter;
 import com.jwtapi.common.HelperJwt;
+import com.jwtapi.common.NoResultFoundException;
 import com.jwtapi.dto.UserInfosDTO;
 import com.jwtapi.model.AuthRequest;
 import com.jwtapi.model.RefreshRequest;
@@ -82,11 +84,18 @@ public class UserController {
 
 	@GetMapping("/user/{id}")
 	@PreAuthorize("hasAuthority('ROLE_USER')")
-	public ResponseEntity<UserInfosDTO> userProfileById(@PathVariable("id") UUID id) {
+	public ResponseEntity<UserInfosDTO> userProfileById(@PathVariable("id") UUID id) throws NoResultFoundException {
 
-		UserInfosDTO userInfosDTO = userInfoService.findById(id).map(userInfosAdapter::transform).orElse(null);
+		UserInfosDTO userInfosDTO = userInfoService.findById(id);
 
 		return ResponseEntity.ok(userInfosDTO);
+	}
+
+	@GetMapping("/user")
+	@PreAuthorize("hasAuthority('ROLE_USER')")
+	public ResponseEntity<List<UserInfosDTO>> allUsers() {
+		List<UserInfosDTO> usersInfosDTO = userInfoService.findAll();
+		return ResponseEntity.ok(usersInfosDTO);
 	}
 
 	@GetMapping("/admin/adminProfile")
