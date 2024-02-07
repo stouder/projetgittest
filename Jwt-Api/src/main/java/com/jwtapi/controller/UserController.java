@@ -34,6 +34,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -64,7 +65,7 @@ public class UserController {
 	}
 
 	@PostMapping("/addNewUser")
-	public String addNewUser(@RequestBody UserInfo userInfo) {
+	public String addNewUser(@Valid @RequestBody UserInfo userInfo) {
 		return userInfoService.addUser(userInfo);
 	}
 

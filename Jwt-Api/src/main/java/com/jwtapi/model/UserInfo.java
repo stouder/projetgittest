@@ -14,6 +14,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +30,9 @@ public class UserInfo {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Schema(description = "id technique", hidden = true)
 	private UUID id;
+	@NotEmpty
 	private String name; 
+	@Email
 	private String email; 
 	private String password;
 	
