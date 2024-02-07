@@ -73,5 +73,6 @@ public class UserInfoService implements UserDetailsService {
 		}
 
 		return userList.stream().map(userInfosAdapter::transform).toList();
+
 	}
 }
