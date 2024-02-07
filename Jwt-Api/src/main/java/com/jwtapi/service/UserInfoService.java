@@ -1,5 +1,6 @@
 package com.jwtapi.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.jwtapi.adapter.UserInfosAdapter;
+import com.jwtapi.common.NoResultFoundException;
 import com.jwtapi.dto.UserInfosDTO;
 import com.jwtapi.model.UserInfo;
 import com.jwtapi.model.UserInfoDetails;
@@ -52,10 +54,24 @@ public class UserInfoService implements UserDetailsService {
 	}
 
 	public UserInfosDTO findEntityByName(String name) {
-		return repository.findByName(name).map(userInfosAdapter::transform).orElse(null);
+		return repository.findByName(name).map(userInfosAdapter::transform).orElseThrow(
+				() -> new NoResultFoundException("Aucun utilisateur courant trouvé avec le nom : " + name));
+
 	}
 
-	public Optional<UserInfo> findById(UUID id) {
-		return repository.findById(id);
+	public UserInfosDTO findById(UUID id) {
+		return repository.findById(id).map(userInfosAdapter::transform)
+				.orElseThrow(() -> new NoResultFoundException("Aucun utilisateur pour l'identifiant  : " + id));
+
+	}
+
+	public List<UserInfosDTO> findAll() {
+		List<UserInfo> userList = repository.findAll();
+
+		if (userList.isEmpty()) {
+			throw new NoResultFoundException("Aucun utilisateur trouvé.");
+		}
+
+		return userList.stream().map(userInfosAdapter::transform).toList();
 	}
 }
