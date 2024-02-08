@@ -34,6 +34,7 @@ public class ApparitionWordList {
 		for (int count : wordCounts.values()) {
 			counts[index++] = count;
 		}
+
 		Arrays.stream(counts).forEach(System.out::println);
 
 		wordCounts.forEach((key, value) -> System.out.println(key + ": " + value));
