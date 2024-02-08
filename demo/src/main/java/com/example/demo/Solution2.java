@@ -1,9 +1,22 @@
 package com.example.demo;
-import java.util.Arrays;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class Solution2 {
-	
+
+	@Data
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class Change {
+		long bill10;
+		long bill5;
+		long coin2;
+	}
+
 	static Change optimal(long s) {
+		Change change = new Change();
 		int[] coins = { 10, 5, 2 };
 
 		for (int coin : coins) {
@@ -28,100 +41,46 @@ public class Solution2 {
 		return change;
 	}
 
-	static Change optimal0(long s) {
-
-		Change change = new Change();
-
-		if (s % 10 > 5 || s % 10 % 5 == 0 || s % 10 % 2 == 0) {
-			change.bill10 = (long) s / 10;
-			s = s - change.bill10 * 10;
-		} else {
-			change.bill10 = (long) s / 10 - 1;
-			s = s - change.bill10 * 10;
-		}
-
-		if (s % 5 % 2 == 0) {
-			change.bill5 = (long) s / 5;
-			s = s - change.bill5 * 5;
-		} else {
-			change.bill5 = (long) s / 5 - 1;
-			s = s - change.bill5 * 5;
-		}
-
-		change.coin2 = (long) s / 2;
-		s = s - change.coin2 * 2;
-
-		if (s != 0) {
-			return null;
-		}
-
-		return change;
-	}
-
-	static Change optimal1(long s) {
+	public static Change optimal1(int amount, int pos, Change change) {
 		int[] coins = { 10, 5, 2 };
 
-		Change change = new Change();
-		for (int c : coins) {
-			if (s > c) {
-				optimal1(s - c);
-			}
-		}
-
-		return change;
-	}
-
-	static int pos = 0;
-	static Change change = new Change();
-
-	public static Change optimal3(int amount) {
-		int[] coins = { 10, 5, 2 };
-
-		if (amount != 0) {
-			if (amount >= coins[pos]) {
-				amount -= coins[pos];
-
-				if (coins[pos] == 10) {
-					change.bill10 += 1;
-				}
-
-				if (coins[pos] == 5) {
-					change.bill5 += 1;
-				}
-
-				if (coins[pos] == 2) {
-					change.coin2 += 1;
-				}
-
-				optimal3(amount);
-			} else {
-
-				if (pos < coins.length - 1) {
-					pos++;
-					optimal3(amount);
-
-				}
-			}
-
-		}
-
-		if (amount != 0)
-			return null;
-		else
+		if (amount == 0) {
 			return change;
+		}
+
+		if (pos < coins.length && amount >= coins[pos]) {
+			amount -= coins[pos];
+
+			if (coins[pos] == 10) {
+				change.bill10 += 1;
+			} else if (coins[pos] == 5) {
+				change.bill5 += 1;
+			} else if (coins[pos] == 2) {
+				change.coin2 += 1;
+			}
+
+			return optimal1(amount, pos, change);
+		} else {
+			if (pos < coins.length - 1) {
+				return optimal1(amount, pos + 1, change);
+			} else {
+				return null;
+			}
+		}
 	}
 
 	public static void main(String args[]) {
+
+		int pos = 0;
+		Change change = new Change();
+
 		int av = 15;
 
-		/*
-		 * Change change = optimal(V, c, 0);
-		 */
-		Change c = optimal3(av);
-		// if( change != null)
-		if (c != null)
+		Change c = optimal1(av, pos, change);
+		if (c != null) {
 			System.out.println(c.bill10 + " - " + c.bill5 + " - " + c.coin2);
-		// else
-		// System.out.print("Null");
+		} else {
+			System.out.println("PAs de rendu de monaie possible");
+		}
 	}
 }
