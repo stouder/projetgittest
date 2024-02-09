@@ -69,7 +69,7 @@ public class Solution2 {
 		}
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 
 		int pos = 0;
 		Change change = new Change();
