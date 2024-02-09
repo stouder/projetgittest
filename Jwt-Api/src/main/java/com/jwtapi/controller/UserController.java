@@ -5,6 +5,9 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +37,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
@@ -52,6 +56,9 @@ public class UserController {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
+
+	@Resource
+	private CacheManager cacheManager;
 
 	@Operation(summary = "Connect to the system using username and password")
 	@ApiResponses(value = {
@@ -78,11 +85,20 @@ public class UserController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String username = authentication.getName();
 
-		UserInfosDTO userInfosDTO = userInfoService.findEntityByName(username);
+		Cache cache = cacheManager.getCache("cache-data");
+
+		UserInfosDTO userInfosDTO = cache.get(username, UserInfosDTO.class);
+		if (userInfosDTO == null) {
+			userInfosDTO = userInfoService.findEntityByName(username);
+			if (userInfosDTO != null) {
+				cache.put(username, userInfosDTO);
+			}
+		}
 
 		return ResponseEntity.ok(userInfosDTO);
 	}
 
+	@Cacheable("cache-data")
 	@GetMapping(value = { "/user/", "/user/{id}" })
 	@PreAuthorize("hasAuthority('ROLE_USER')")
 	public ResponseEntity<UserInfosDTO> userProfileById(@PathVariable UUID id) throws NoResultFoundException {
@@ -106,7 +122,7 @@ public class UserController {
 	}
 
 	@PostMapping("/generateToken")
-	public ResponseEntity<String> authenticateAndGetToken(@RequestBody AuthRequest authRequest,
+	public ResponseEntity<String> authenticateAndGetToken(@RequestBody @Valid AuthRequest authRequest,
 			HttpServletResponse response) throws AuthenticationException {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
@@ -120,7 +136,8 @@ public class UserController {
 	}
 
 	@PostMapping("/refresh")
-	public ResponseEntity<String> refresh(@RequestBody RefreshRequest refreshRequest, HttpServletResponse response) {
+	public ResponseEntity<String> refresh(@RequestBody @Valid RefreshRequest refreshRequest,
+			HttpServletResponse response) {
 		String refreshToken = refreshRequest.getToken();
 		String newAccessToken = jwtService.refreshAccessToken(refreshToken);
 		HelperJwt.setCookie(response, "jwt", newAccessToken, expirationcookie);
