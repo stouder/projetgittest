@@ -46,7 +46,6 @@ public class GlobalExceptionController {
 	@ExceptionHandler(NoResourceFoundException.class)
 	public ResponseEntity<String> handleNoResourceFoundException(NoResourceFoundException ex,
 			HttpServletResponse response) {
-		response.toString();
 		String errorMessage = "Pas de resource pour cet url " + ex.getResourcePath();
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 	}

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jwtapi.adapter.UserInfosAdapter;
 import com.jwtapi.common.HelperJwt;
 import com.jwtapi.common.NoResultFoundException;
 import com.jwtapi.dto.UserInfosDTO;
@@ -54,9 +53,6 @@ public class UserController {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
-	@Autowired
-	private UserInfosAdapter userInfosAdapter;
-
 	@Operation(summary = "Connect to the system using username and password")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Logged in successfully.", content = @Content(schema = @Schema(implementation = RefreshRequest.class))) })
@@ -64,6 +60,11 @@ public class UserController {
 	@GetMapping("/welcome")
 	public String welcome() {
 		return "Welcome this endpoint is not secure";
+	}
+
+	@GetMapping(value = { "/bonjour/", "/bonjour/{name}" })
+	public String bonjour(@PathVariable(name = "name") String name) {
+		return "Bonjour cet endpoint n'est pas sécurisé " + name;
 	}
 
 	@PostMapping("/addNewUser")
@@ -82,16 +83,16 @@ public class UserController {
 		return ResponseEntity.ok(userInfosDTO);
 	}
 
-	@GetMapping("/user/{id}")
+	@GetMapping(value = { "/user/", "/user/{id}" })
 	@PreAuthorize("hasAuthority('ROLE_USER')")
-	public ResponseEntity<UserInfosDTO> userProfileById(@PathVariable("id") UUID id) throws NoResultFoundException {
+	public ResponseEntity<UserInfosDTO> userProfileById(@PathVariable UUID id) throws NoResultFoundException {
 
 		UserInfosDTO userInfosDTO = userInfoService.findById(id);
 
 		return ResponseEntity.ok(userInfosDTO);
 	}
 
-	@GetMapping("/user")
+	@GetMapping("/users")
 	@PreAuthorize("hasAuthority('ROLE_USER')")
 	public ResponseEntity<List<UserInfosDTO>> allUsers() {
 		List<UserInfosDTO> usersInfosDTO = userInfoService.findAll();

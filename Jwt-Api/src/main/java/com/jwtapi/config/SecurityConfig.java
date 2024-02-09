@@ -30,11 +30,8 @@ public class SecurityConfig {
 
 	private static final String[] AUTH_WHITELIST = { "/v3/api-docs/**", "/swagger-ui/**" };
 
-
 	@Autowired
 	private AuthenticationEntryPoint unauthorizedHandler;
-
-
 
 	@Bean
 	public UserDetailsService userDetailsService() {
@@ -46,8 +43,8 @@ public class SecurityConfig {
 		return http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(requests -> requests
 						.requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken", "/auth/refresh",
-								"/auth/deleteCookie")
-						.permitAll().requestMatchers("/auth/user/**").hasAuthority("ROLE_USER")
+								"/auth/deleteCookie", "/auth/bonjour/**")
+						.permitAll().requestMatchers("/auth/user/**", "/auth/users").hasAuthority("ROLE_USER")
 						.requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN"))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider())
@@ -65,7 +62,7 @@ public class SecurityConfig {
 	public JwtAuthFilter authFilter() {
 		return new JwtAuthFilter();
 	}
-	
+
 	@Bean
 	public AuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -93,5 +90,5 @@ public class SecurityConfig {
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return (web -> web.ignoring().requestMatchers(AUTH_WHITELIST));
 	}
-	
+
 }
