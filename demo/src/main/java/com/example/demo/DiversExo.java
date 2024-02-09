@@ -15,10 +15,24 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DiversExo {
+
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Employee {
+
+		private String name;
+		private int age;
+		private int salary;
+
+	}
 
 	@FunctionalInterface
 	interface Operation {
@@ -217,9 +231,9 @@ public class DiversExo {
 	}
 
 	static int greaterElements(int[] arr) {
-		return Arrays.stream(arr).reduce(Integer.MAX_VALUE, (a,b)->Integer.max(a,b));
+		return Arrays.stream(arr).reduce(Integer.MAX_VALUE, (a, b) -> Integer.max(a, b));
 	}
-	
+
 	static boolean exists(int[] ints, int k) {
 		return Arrays.binarySearch(ints, k) >= 0 ? true : false;
 	}

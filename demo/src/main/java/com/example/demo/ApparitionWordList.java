@@ -39,5 +39,7 @@ public class ApparitionWordList {
 
 		wordCounts.forEach((key, value) -> System.out.println(key + ": " + value));
 
+		int num = 222;
+
 	}
 }
