@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,9 +41,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/auth")
+@Slf4j
 public class UserController {
 
 	@Value("${app.cookie.expiration}")
@@ -87,15 +90,20 @@ public class UserController {
 
 		Cache cache = cacheManager.getCache("cache-data");
 
-		UserInfosDTO userInfosDTO = cache.get(username, UserInfosDTO.class);
-		if (userInfosDTO == null) {
-			userInfosDTO = userInfoService.findEntityByName(username);
-			if (userInfosDTO != null) {
-				cache.put(username, userInfosDTO);
+		if (cache != null) {
+			UserInfosDTO userInfosDTO = cache.get(username, UserInfosDTO.class);
+			if (userInfosDTO == null) {
+				userInfosDTO = userInfoService.findEntityByName(username);
+				if (userInfosDTO != null) {
+					cache.put(username, userInfosDTO);
+				}
 			}
+			return ResponseEntity.ok(userInfosDTO);
+		} else {
+			log.error("Cache problem : cache instance is null");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 
-		return ResponseEntity.ok(userInfosDTO);
 	}
 
 	@Cacheable("cache-data")

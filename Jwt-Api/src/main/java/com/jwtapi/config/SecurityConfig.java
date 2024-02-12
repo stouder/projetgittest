@@ -39,7 +39,7 @@ public class SecurityConfig {
 		return http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(requests -> requests
 						.requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken", "/auth/refresh",
-								"/auth/deleteCookie", "/auth/bonjour/**")
+								"/auth/deleteCookie", "/auth/bonjour/**", "/actuator/**")
 						.permitAll().requestMatchers("/auth/user/**", "/auth/users").hasAuthority("ROLE_USER")
 						.requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN"))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

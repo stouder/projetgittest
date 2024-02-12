@@ -15,9 +15,11 @@ import com.jwtapi.model.UserRole;
 public interface UserInfosMapper {
 
 	@Mapping(target = "roles", expression = "java(mapRoles(user.getRoles()))")
+	@Mapping(target = "dateCreated", source = "dateCreated", dateFormat = "dd-MM-yyyy")
 	UserInfosDTO mapToUserDto(UserInfo user);
 
 	@Mapping(target = "roles", expression = "java(mapRolesDto(userDto.getRoles()))")
+	@Mapping(target = "dateCreated", source = "dateCreated", dateFormat = "dd-MM-yyyy")
 	UserInfo mapToUser(UserInfosDTO userDto);
 
 	default String mapRoles(Set<UserRole> roles) {
