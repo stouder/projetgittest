@@ -15,9 +15,11 @@ public class MultiplesFinder {
 		List<Integer> multiples = new ArrayList<>();
 
 		IntStream.rangeClosed(1, n).filter(i -> i % 3 == 0 || i % 5 == 0 || i % 7 == 0).forEach(multiples::add);
+		int somme = IntStream.rangeClosed(1, n).filter(i -> i % 3 == 0 || i % 5 == 0 || i % 7 == 0).sum();
 
 		multiples.forEach(System.out::println);
 
+		System.out.println("Somme " + somme);
 		scanner.close();
 	}
 }

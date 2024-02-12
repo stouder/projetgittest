@@ -346,12 +346,16 @@ public class DiversExo {
 	}
 
 	public static boolean isTwin(String a, String b) {
+		if (a.length() != b.length()) {
+			return false;
+		}
+
 		byte[] first = a.toLowerCase().getBytes();
 		byte[] second = b.toLowerCase().getBytes();
 		Arrays.sort(first);
 		Arrays.sort(second);
 
-		return new String(first).equals(new String(second));
+		return Arrays.equals(first, second);
 	}
 
 	public static void main(String[] args) {
