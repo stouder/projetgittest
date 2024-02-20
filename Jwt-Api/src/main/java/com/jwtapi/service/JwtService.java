@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.jwtapi.config.ConfigurationPropertiesRefreshConfigBean;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -25,11 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JwtService {
 
-	@Value("${app.token.secret}")
-	private String secret;
-
-	@Value("${app.token.expiration}")
-	private long expirationjwt;
+	@Autowired
+	ConfigurationPropertiesRefreshConfigBean env;
 
 	public String generateToken(String userName) {
 		Map<String, Object> claims = new HashMap<>();
@@ -38,25 +37,26 @@ public class JwtService {
 
 	private String createToken(Map<String, Object> claims, String userName) {
 		return Jwts.builder().setClaims(claims).setSubject(userName).setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + expirationjwt))
+				.setExpiration(new Date(System.currentTimeMillis() + env.getExpirationjwt()))
 				.signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
 	}
 
 	public String refreshAccessToken(String refreshToken) {
 
 		try {
-		    Claims claims = Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(refreshToken).getBody();
-		    return generateToken(claims.getSubject());
+			Claims claims = Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(refreshToken)
+					.getBody();
+			return generateToken(claims.getSubject());
 		} catch (ExpiredJwtException ex) {
-		    return generateToken(ex.getClaims().getSubject());		    
+			return generateToken(ex.getClaims().getSubject());
 		} catch (JwtException ex) {
-		    return "";
+			return "";
 		}
 
 	}
 
 	private Key getSignKey() {
-		byte[] keyBytes = Decoders.BASE64.decode(secret);
+		byte[] keyBytes = Decoders.BASE64.decode(env.getSecret());
 		return Keys.hmacShaKeyFor(keyBytes);
 	}
 

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jwtapi.common.HelperJwt;
 import com.jwtapi.common.NoResultFoundException;
+import com.jwtapi.config.ConfigurationPropertiesRefreshConfigBean;
 import com.jwtapi.dto.UserInfosDTO;
 import com.jwtapi.model.AuthRequest;
 import com.jwtapi.model.RefreshRequest;
@@ -48,11 +48,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserController {
 
-	@Value("${app.cookie.expiration}")
-	private long expirationcookie;
-
 	@Autowired
 	private UserInfoService userInfoService;
+
+	@Autowired
+	ConfigurationPropertiesRefreshConfigBean env;
 
 	@Autowired
 	private JwtService jwtService;
@@ -136,7 +136,7 @@ public class UserController {
 				new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
 		if (authentication.isAuthenticated()) {
 			String token = jwtService.generateToken(authRequest.getUsername());
-			HelperJwt.setCookie(response, "jwt", token, expirationcookie);
+			HelperJwt.setCookie(response, "jwt", token, env.getExpirationcookie());
 			return ResponseEntity.ok(token);
 		} else {
 			throw new UsernameNotFoundException("invalid user request !");
@@ -148,7 +148,7 @@ public class UserController {
 			HttpServletResponse response) {
 		String refreshToken = refreshRequest.getToken();
 		String newAccessToken = jwtService.refreshAccessToken(refreshToken);
-		HelperJwt.setCookie(response, "jwt", newAccessToken, expirationcookie);
+		HelperJwt.setCookie(response, "jwt", newAccessToken, env.getExpirationcookie());
 		return ResponseEntity.ok(newAccessToken);
 	}
 

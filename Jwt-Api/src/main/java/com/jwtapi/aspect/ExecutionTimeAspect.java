@@ -8,11 +8,10 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import com.jwtapi.service.LogCallService;
+import com.jwtapi.config.ConfigurationPropertiesRefreshConfigBean;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,10 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ExecutionTimeAspect {
 
 	@Autowired
-	private LogCallService logCallService;
-
-	@Value("${execution.time.aspect.date.format}")
-	private String formatDate;
+	ConfigurationPropertiesRefreshConfigBean env;
 
 	@Pointcut("within(com.jwtapi.service.*)")
 	public void executionTimePackage() {
@@ -34,7 +30,7 @@ public class ExecutionTimeAspect {
 
 	@Around("executionTimePackage()")
 	public Object executionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-		SimpleDateFormat sdf = new SimpleDateFormat(formatDate);
+		SimpleDateFormat sdf = new SimpleDateFormat(env.getFormatDate());
 		long startTime = System.currentTimeMillis();
 		log.info("Before executing: " + joinPoint.getSignature().toShortString() + " : "
 				+ sdf.format(new Date(startTime)));

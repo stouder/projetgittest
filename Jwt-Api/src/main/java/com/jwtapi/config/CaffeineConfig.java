@@ -1,6 +1,6 @@
 package com.jwtapi.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -13,22 +13,19 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 @EnableCaching
 public class CaffeineConfig {
 
-	@Value("${spring.cache.caffeine.spec}")
-	private String cacheSpec;
-
-	@Value("${spring.cache.cache-names}")
-	private String cacheName;
+	@Autowired
+	ConfigurationPropertiesRefreshConfigBean env;
 
 	@Bean
 	public CacheManager cacheManager() {
-		CaffeineCacheManager cacheManager = new CaffeineCacheManager(cacheName);
+		CaffeineCacheManager cacheManager = new CaffeineCacheManager(env.getCacheName());
 		cacheManager.setCaffeine(caffeineCacheBuilder());
 
 		return cacheManager;
 	}
 
 	Caffeine<Object, Object> caffeineCacheBuilder() {
-		return Caffeine.from(cacheSpec).recordStats();
+		return Caffeine.from(env.getCacheSpec()).recordStats();
 	}
 
 }
