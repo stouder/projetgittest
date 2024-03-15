@@ -4,40 +4,108 @@ import java.util.Scanner;
 
 public class Risk {
 
-	public static double calculerProbabiliteVictoire(int armees_attaque, int armees_defense) {
-		if (armees_attaque < 1 || armees_defense < 1) {
-			return 0.0;
+	public static double calculateVictoryProbability() {
+		int victoireAttaque = 0;
+		int total = 0;
+
+		for (int i = 0; i < 6; i++) {
+			for (int j = 0; j < 6; j++) {
+				if (i > j) {
+					victoireAttaque++;
+
+				}
+				total++;
+			}
 		}
 
-		int des_attaque = Math.min(3, armees_attaque - 1);
-		int des_defense = Math.min(2, armees_defense);
+		double p = 0.0;
 
-		double[][] resultats = new double[des_attaque][des_defense];
+		if (total != 0) {
+			p = (double) victoireAttaque / total;
+		}
 
-		for (int i = 0; i < des_attaque; i++) {
-			for (int j = 0; j < des_defense; j++) {
-				if (i == 0) {
-					resultats[i][j] = (6 - j) / 6.0;
-				} else if (j == 0) {
-					resultats[i][j] = (6 - i) / 6.0;
+		return p;
+	}
+
+	public static boolean victoire(int attack, int defense) {
+		return attack == 0 || defense == 0;
+	}
+
+	public static double calculateOverallVictoryProbability(int attack, int defense) {
+		if (attack == 0) {
+			return 0.0;
+		}
+		if (defense == 0) {
+			return 100.0;
+		}
+
+		double victoryProbability = calculateVictoryProbability();
+		double overallProbability = 0.0;
+
+		for (int i = 1; i <= attack; i++) {
+			for (int j = 1; j <= defense; j++) {
+				if (i > j) {
+					overallProbability += victoryProbability
+							* calculateOverallVictoryProbability(attack - 1, defense - 1);
 				} else {
-					resultats[i][j] = (i - 1) / (double) (i + j - 1);
+					overallProbability += (1 - victoryProbability)
+							* calculateOverallVictoryProbability(attack, defense - 1);
 				}
 			}
 		}
 
-		double victoires_attaquant = 0;
-		double total_resultats = 0;
+		return overallProbability / (attack * defense);
+	}
 
-		for (int i = 0; i < des_attaque; i++) {
-			for (int j = 0; j < des_defense; j++) {
-				double probabilite = resultats[i][j];
-				victoires_attaquant += probabilite;
-				total_resultats += 1;
+	public static double calculateVictoryProbability(int attackDice, int defenseDice) {
+		int victoryAttack = 0;
+		int total = 0;
+
+		for (int i = 1; i <= attackDice; i++) {
+			for (int j = 1; j <= defenseDice; j++) {
+				if (i > j || (i == j && attackDice > 1)) {
+					victoryAttack++;
+				}
+				total++;
 			}
 		}
 
-		return Math.round((victoires_attaquant / total_resultats) * 10000.0) / 100.0;
+		double p = 0.0;
+
+		if (total != 0) {
+			p = (double) victoryAttack / total;
+		}
+
+		return p;
+	}
+
+	public static double calculateVictoryProbability3vs1() {
+		int attackWins = 0;
+		int totalOutcomes = 0;
+
+		// Boucle sur tous les résultats possibles du dé d'attaque 1
+		for (int attackRoll1 = 1; attackRoll1 <= 6; attackRoll1++) {
+			// Boucle sur tous les résultats possibles du dé d'attaque 2
+			for (int attackRoll2 = 1; attackRoll2 <= 6; attackRoll2++) {
+				// Boucle sur tous les résultats possibles du dé d'attaque 3
+				for (int attackRoll3 = 1; attackRoll3 <= 6; attackRoll3++) {
+					// Boucle sur tous les résultats possibles du dé de défense
+					for (int defenseRoll = 1; defenseRoll <= 6; defenseRoll++) {
+						totalOutcomes++;
+
+						// Vérifier si l'attaquant gagne
+						if (attackRoll1 > defenseRoll || attackRoll2 > defenseRoll || attackRoll3 > defenseRoll) {
+							attackWins++;
+						}
+					}
+				}
+			}
+		}
+
+		// Calculer la probabilité de victoire de l'attaquant
+		double victoryProbability = (double) attackWins / totalOutcomes;
+
+		return victoryProbability;
 	}
 
 	public static void main(String[] args) {
@@ -45,16 +113,19 @@ public class Risk {
 
 		// Entrée
 		System.out.println("Veuillez entrer le nombre d'armées d'attaque :");
-		int armees_attaque = scanner.nextInt();
+		int armeesattaque = scanner.nextInt();
 
 		System.out.println("Veuillez entrer le nombre d'armées de défense :");
-		int armees_defense = scanner.nextInt();
+		int armeesdefense = scanner.nextInt();
+
+		double v = calculateOverallVictoryProbability(armeesattaque, armeesdefense);
+
+		System.out.printf("%.2f%%%n", v);
 
 		// Calcul des probabilités de victoire
-		double probabilite_victoire = calculerProbabiliteVictoire(armees_attaque, armees_defense);
+		double probability = calculateVictoryProbability3vs1();
+		System.out.printf("%.2f%%%n", probability);
 
-		// Sortie
-		System.out.println("Les chances de victoire de l'attaquant sont de : " + probabilite_victoire + "%");
 	}
 
 }
